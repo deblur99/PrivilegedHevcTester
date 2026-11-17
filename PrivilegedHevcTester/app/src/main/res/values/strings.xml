@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Privileged HEVC Tester</string>
+    <string name="test_webview_91">Test WebView 91</string>
+    <string name="test_webview_134">Test WebView 134</string>
+    <string name="codec_hevc">HEVC</string>
+    <string name="codec_h264">H.264</string>
+</resources>

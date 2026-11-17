@@ -1,0 +1,1 @@
+# ProGuard rules for PrivilegedHevcTester (debug builds do not minify).

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebView video smoke</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #f2f2f2;
+      padding: 12px;
+    }
+    h1 { font-size: 18px; margin: 0 0 8px; }
+    #meta, #log {
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #1c1c1c;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    video {
+      width: 100%;
+      max-height: 55vh;
+      background: #000;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">video smoke</h1>
+  <div id="meta"></div>
+  <video id="v" controls playsinline preload="metadata"></video>
+  <div id="log"></div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const src = params.get('src') || 'hevc-lesson.mp4';
+    const label = params.get('label') || src;
+    const logEl = document.getElementById('log');
+    const metaEl = document.getElementById('meta');
+    const v = document.getElementById('v');
+    document.getElementById('title').textContent = label + ' <video> smoke';
+    function log(msg) {
+      const line = '[' + new Date().toISOString().slice(11, 19) + '] ' + msg;
+      logEl.textContent += line + '\n';
+      console.log(line);
+    }
+    v.src = src;
+    const canHvc1 = v.canPlayType('video/mp4; codecs="hvc1"');
+    const canHev1 = v.canPlayType('video/mp4; codecs="hev1"');
+    const canAvc1 = v.canPlayType('video/mp4; codecs="avc1.42E01E"');
+    metaEl.textContent =
+      'UA: ' + navigator.userAgent + '\n' +
+      'label: ' + label + '\n' +
+      'canPlayType hvc1: "' + canHvc1 + '"\n' +
+      'canPlayType hev1: "' + canHev1 + '"\n' +
+      'canPlayType avc1: "' + canAvc1 + '"\n' +
+      'src: ' + v.src;
+    ['loadstart','loadedmetadata','loadeddata','canplay','canplaythrough','playing','error','stalled','abort'].forEach(function (ev) {
+      v.addEventListener(ev, function () {
+        if (ev === 'error') {
+          const err = v.error;
+          log('error code=' + (err && err.code) + ' message=' + (err && err.message));
+        } else if (ev === 'loadedmetadata') {
+          log(ev + ' size=' + v.videoWidth + 'x' + v.videoHeight + ' duration=' + v.duration);
+        } else {
+          log(ev);
+        }
+      });
+    });
+    v.play().then(function () { log('play() resolved'); }).catch(function (e) { log('play() rejected: ' + e); });
+  </script>
+</body>
+</html>
